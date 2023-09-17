@@ -1,117 +1,110 @@
 <!-- eslint-disable vue/no-side-effects-in-computed-properties -->
 <template>
-  <div class="container">
-    <div
-      class="title border-bottom d-flex align-items-center justify-content-between
+  <div class="container-fluid">
+    <header>
+      <HeaderWeb />
+    </header>
+
+    <main class="container mt-4">
+      <div
+        class="title border-bottom d-flex align-items-center justify-content-between
 py-2"
-    >
-      <h5>Task</h5>
-      <div class="d-flex align-items-center ms-auto">
-        <input v-model="searchQuery" type="text" class="form-control me-4" placeholder="Search">
+      >
+        <h5>Task</h5>
+        <div class="d-flex align-items-center ms-auto">
+          <input v-model="searchQuery" type="text" class="form-control me-4" placeholder="Search">
 
-        <select v-model="searchCategory" class="form-control">
-          <option disabled value="">
-            Search by Category
-          </option>
-          <option v-for="(category, i) in listCategory" :key="i" :value="category">
-            {{ category }}
-          </option>
-        </select>
+          <select v-model="searchCategory" class="form-control">
+            <option disabled value="">
+              Search by Category
+            </option>
+            <option v-for="(category, i) in listCategory" :key="i" :value="category">
+              {{ category }}
+            </option>
+          </select>
 
-        <div class="d-flex align-items-center justify-content-end w-100">
-          <span class="me-2 text-center">
-            View As
-          </span>
-          <button class="btn btn-outline-secondary py-1 px-3" @click="isGrid = !isGrid">
-            {{ isGrid ? 'Grid' : 'List' }}
-          </button>
-        </div>
-      </div>
-    </div>
-    <div class="list-task row">
-      <div v-if="searchQuery !== ''">
-        <div v-if="resultQuery.length">
-          <CardItem
-            v-for="(task, i) in resultQuery"
-            :key="i"
-            :task="task"
-            :is-grid="isGrid"
-          />
-        </div>
-        <h3 v-else class="text-center mt-5">
-          Catatan tidak ada
-        </h3>
-      </div>
-      <div v-else-if="searchCategory !== ''">
-        <div v-if="resultCategory.length">
-          <CardItem
-            v-for="(task, i) in resultCategory"
-            :key="i"
-            :task="task"
-            :is-grid="isGrid"
-          />
-        </div>
-        <h3 v-else class="text-center mt-5">
-          Catatan tidak ada
-        </h3>
-      </div>
-      <div v-else>
-        <CardItem
-          v-for="(task, i) in tasks"
-          :key="i"
-          :task="task"
-          :is-grid="isGrid"
-        />
-      </div>
-    </div>
-
-    <div class="action py-2">
-      <a v-if="!isCreating" href="#" class="add-button" @click="isCreating = !isCreating">Add Task</a>
-      <div v-else class="add-card">
-        <div class="card mb-2">
-          <div class="card-body d-flex flex-column p-0">
-            <input class="form-control border-0 mb-2" placeholder="Title" type="text">
-            <textarea class="form-control border-0 small" placeholder="Description" rows="3" />
+          <div class="d-flex align-items-center justify-content-end w-100">
+            <span class="me-2 text-center">
+              View As
+            </span>
+            <button class="btn btn-outline-secondary py-1 px-3" @click="isGrid = !isGrid">
+              {{ isGrid ? 'Grid' : 'List' }}
+            </button>
           </div>
         </div>
-        <div class="button-wrapper d-flex">
-          <button class="btn btn-primary me-2">
-            Save
-          </button>
-          <button class="btn btn-outline-secondary" @click="isCreating = !isCreating">
-            Cancel
-          </button>
+      </div>
+
+      <div v-if="!isCreating" class="list-task row">
+        <div v-if="searchQuery !== ''">
+          <div v-if="resultQuery.length">
+            <CardItem v-for="(task, i) in resultQuery" :key="i" :task="task" :is-grid="isGrid" />
+          </div>
+          <h3 v-else class="text-center mt-5">
+            Catatan tidak ada
+          </h3>
+        </div>
+        <div v-else-if="searchCategory !== ''">
+          <div v-if="resultCategory.length">
+            <CardItem v-for="(task, i) in resultCategory" :key="i" :task="task" :is-grid="isGrid" />
+          </div>
+          <h3 v-else class="text-center mt-5">
+            Catatan tidak ada
+          </h3>
+        </div>
+        <div v-else>
+          <CardItem v-for="(task, i) in tasks" :key="i" :task="task" :is-grid="isGrid" />
         </div>
       </div>
-    </div>
+
+      <button v-if="!isCreating" href="#" class="btn btn-primary mt-5" @click="isCreating = !isCreating">
+        Add Task
+      </button>
+      <div v-else class="action py-2">
+        <div>
+          <FormInput :categories="listCategory" @on-cancel-form="onCancelFormInputHandler" @on-submit-form="onSubmitFormHandler" />
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <FooterWeb />
+    </footer>
   </div>
 </template>
 <script>
-import CardItem from '~/components/CardItem.vue'
 
 export default {
-  components: { CardItem },
   data () {
     return {
       // Daftar task
       tasks: [
         {
-          title: 'Task 1',
-          description: 'ini deskripsi',
-          isDone: false,
-          category: 'Web'
-        },
-        {
-          title: 'Task 2',
-          description: 'ini deskripsi 2',
+          id: 1,
+          title: 'Learn Machine Learning',
+          description: 'Memulai belajar machine learning dengan bahasa pemrograman python',
           isDone: false,
           category: 'Backend'
         },
         {
-          title: 'Task 3',
-          description: ' ini deskripsi 3',
+          id: 2,
+          title: 'Learn NuxtJs',
+          description: 'Memulai belajar NuxtJs dengan Kelas Beta Intensif',
+          isDone: true,
+          category: 'FrontEnd'
+        },
+        {
+          id: 3,
+          title: 'Learn ReactJs',
+          description: 'Memulai belajar ReactJs',
           isDone: false,
           category: 'Frontend'
+        },
+        {
+          id: 4,
+          title: 'Learn Fundamental Javascript',
+          description: 'Memulai belajar Fundamental Javascript',
+          isDone: false,
+          category: 'Javascript'
         }
       ],
       listCategory: [
@@ -151,6 +144,23 @@ export default {
         this.searchQuery = ''
         return this.tasks.filter(item => item.category.toLowerCase() === this.searchCategory.toLowerCase())
       }
+    }
+  },
+  methods: {
+    onCancelFormInputHandler () {
+      this.isCreating = !this.isCreating
+    },
+    onSubmitFormHandler ({ title, description, category }) {
+      const newTask = {
+        id: +new Date(),
+        title,
+        description,
+        isDone: false,
+        category
+      }
+
+      this.tasks.unshift(newTask)
+      this.isCreating = !this.isCreating
     }
   }
 }
